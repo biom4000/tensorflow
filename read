@@ -1,0 +1,30 @@
+import pathlib
+import tensorflow as tf
+from keras.datasets import mnist
+from keras.utils import np_utils
+from keras.models import load_model
+
+## step 1 資料預處理 Preprocess：處理後產生 features (影像特徵值)與 label (數字的真實值)
+# 讀取 mnist 資料
+(x_Train, y_Train), (x_Test, y_Test) = mnist.load_data()
+# 將 features (影像特徵值)，轉換為 4 維矩陣
+# 將 features，以 reshape 轉為 6000 x 28 x 28 x 1 的 4 維矩陣
+x_Train4D = x_Train.reshape(x_Train.shape[0],28,28,1).astype('float32')
+x_Test4D = x_Test.reshape(x_Test.shape[0],28,28,1).astype('float32')
+
+# 將 features 標準化
+x_Train4D_normalize = x_Train4D / 255
+x_Test4D_normalize = x_Test4D / 255
+
+# 以 Onehot Encoding 轉換 label
+y_TrainOneHot = np_utils.to_categorical(y_Train)
+y_TestOneHot = np_utils.to_categorical(y_Test)
+
+model = load_model('model.h5')
+
+# 驗證模型
+score = model.evaluate(x_Test4D_normalize, y_TestOneHot, verbose=0)
+
+# 輸出結果
+print('Test loss:', score[0])
+print('Test accuracy:', score[1])
