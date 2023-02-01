@@ -1,8 +1,12 @@
 import pathlib
+from cv2 import resize
 import tensorflow as tf
 from keras.datasets import mnist
 from keras.utils import np_utils
 from keras.models import load_model
+import numpy as np
+
+from PIL import Image
 
 ## step 1 資料預處理 Preprocess：處理後產生 features (影像特徵值)與 label (數字的真實值)
 # 讀取 mnist 資料
@@ -28,3 +32,29 @@ score = model.evaluate(x_Test4D_normalize, y_TestOneHot, verbose=0)
 # 輸出結果
 print('Test loss:', score[0])
 print('Test accuracy:', score[1])
+
+
+
+image_path = './image/'
+image_name = '3.png'
+# 以黑白方式讀取圖片
+img = Image.open(image_path+image_name).convert('L')
+(w, h) = img.size
+print('w=%d, h=%d', w, h)
+img.show()
+
+new_img = img.resize((28, 28))
+new_img.show()
+# new_img.save(image_name)
+
+new_img = np.reshape(new_img, (28, 28, 1)) / 255.
+x = np.array([1 - new_img])
+
+# API refer: https://keras.io/models/model/
+y = model.predict(x)
+
+# 因為x只傳入了一張圖片，取y[0]即可
+# np.argmax()取得最大值的下標，即代表的數字
+print(image_path+image_name)
+print(y[0])
+print('        -> Predict picture number is: ', np.argmax(y[0]))
